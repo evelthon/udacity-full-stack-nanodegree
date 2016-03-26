@@ -4,6 +4,11 @@ A cloud based project for conference organization
 
 ## Task 1: Add Sessions to a Conference
 The required endpoints for sessions and speaker where created. Specifically:
+1. The speaker is a property of the Session class. It is a required string.
+Alternatively, the speaker could be linked to a user account for this to be
+more consistent.
+1. Sessions where designed as children of the conference. As such, the ancestor
+keyword was used to signify this.
 1. The speaker is a property of the Session class. It is a `required string`.
 Alternatively, the speaker could be linked to a user account for this to be
 more consistent. Still, doing so would require the speaker to register as a
@@ -56,5 +61,4 @@ in memcache a speaker with many sessions.
 [1]: https://cloud.google.com/appengine/downloads
 [2]: https://console.developers.google.com/
 [3]: https://developers.google.com/appengine/docs/python/endpoints/endpoints_tool
-
 
