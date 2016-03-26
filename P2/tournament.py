@@ -74,23 +74,15 @@ def playerStandings():
 
     # Use a left join to list players with 0 matches
     c.execute("""SELECT p.id, p.name,
-        COUNT(m.winner) AS wins,
-        (
-        (
-        SELECT COUNT(m.winner)AS wins
-        FROM matches AS m, players AS p
-        WHERE m.winner = p.id
-        )+(
-        SELECT COUNT(m.loser)AS losses
-        FROM matches AS m, players AS p
-        WHERE m.winner = p.id
-        )
-        ) as SUms
+        SUM(case when m.winner = p.id then 1 else 0 end) as wins,
+        SUM(case when m.winner = p.id  OR m.loser = p.id then 1 else 0 end)
+        AS matches
         FROM players AS p LEFT JOIN matches AS m
         ON (m.winner = p.id OR m.loser = p.id)
         GROUP BY p.id, p.name
-        ORDER BY wins""")
+        ORDER BY wins DESC""")
     player_standings = list(c)
+    # print(player_standings)
     conn.close()
     return player_standings
 
@@ -102,8 +94,15 @@ def reportMatch(winner, loser):
       winner:  the id number of the player who won
       loser:  the id number of the player who lost
     """
- 
- 
+
+    conn = connect()
+    c = conn.cursor()
+    c.execute("INSERT INTO matches (winner, loser) VALUES (%s, %s)", (winner,
+                                                                      loser))
+    conn.commit()
+    conn.close()
+
+
 def swissPairings():
     """Returns a list of pairs of players for the next round of a match.
   
@@ -119,5 +118,3 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
-
-
