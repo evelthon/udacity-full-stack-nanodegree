@@ -882,7 +882,7 @@ class ConferenceApi(remote.Service):
                                    session in sessions])
 
         # Get user profile
-        prof = self._getProfileFromUser()
+        # prof = self._getProfileFromUser()
 
 
     @endpoints.method(WISHLIST_POST_REQUEST, SessionForm,
@@ -891,6 +891,36 @@ class ConferenceApi(remote.Service):
         """ Removes the session from the user's list of sessions they are
         interested in attending
         """
+        # make sure user is authed
+        user = endpoints.get_current_user()
+        if not user:
+            raise endpoints.UnauthorizedException('Authorization required')
+
+        # Make sure a session with that key exists
+        session = ndb.Key(urlsafe=request.websafeSessionKey).get()
+
+        if not session:
+            raise endpoints.NotFoundException('No session found with key: %s'
+                                              % request.websafeSessionKey)
+
+        # Get user profile
+        prof = self._getProfileFromUser()
+
+        # Make sure session is in the user's wishlist
+        if session.key not in prof.sessionWishlist:
+            raise endpoints.BadRequestException(
+                'The wishlist does not include a session with key: %s' %
+                request.websafeSessionKey)
+
+        # remove session from wishlist if in wishlist
+        if session.key in prof.sessionWishlist:
+            prof.sessionWishlist.remove(session.key)
+
+        # write things back to the datastore & return
+        prof.put()
+
+        return self._copySessionToForm(session)
+
 
 # - - - Profile objects - - - - - - - - - - - - - - - - - - -
 
