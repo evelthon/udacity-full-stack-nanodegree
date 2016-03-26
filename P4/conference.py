@@ -759,13 +759,16 @@ class ConferenceApi(remote.Service):
                 'Only the conference owner can add sessions')
 
         # Copy SessionForm message to dict
-        data = {field.name: getattr(request, field.name) for field in request.all_fields()}
+        data = {field.name: getattr(request, field.name) for field in request.\
+                all_fields()}
 
         if data['date']:
-            data['date'] = datetime.strptime(data['date'][:10], "%Y-%m-%d").date()
+            data['date'] = datetime.strptime(data['date'][:10], "%Y-%m-%d")\
+                .date()
 
         if data['startTime']:
-            data['startTime'] = datetime.strptime(data['startTime'][:5], "%H:%M").time()
+            data['startTime'] = datetime.strptime(data['startTime'][:5],
+                                                  "%H:%M").time()
 
         # Generate session key using parent relationship
         p_key = ndb.Key(Conference, conf.key.id())
@@ -781,13 +784,16 @@ class ConferenceApi(remote.Service):
         """
         Addition for Task 4
         If speaker exists in other sessions as well, save in memcache
+        Create ancestor query for all key matches for this speaker
         """
-        sessions = Session.query(Session.speaker == data['speaker'], ancestor=p_key)
+        sessions = Session.query(Session.speaker == data['speaker'],
+                                 ancestor=p_key)
 
         if len(list(sessions)) > 1:
             memcache_data = {}
             memcache_data['speaker'] = data['speaker']
-            memcache_data['sessionNames'] = [session.name for session in sessions]
+            memcache_data['sessionNames'] = [session.name for session in
+                                             sessions]
 
             if not memcache.set(MEMCACHE_SPEAKER_KEY, memcache_data):
                 logging.error('Memcache set failed for featured speaker')
@@ -837,7 +843,8 @@ class ConferenceApi(remote.Service):
                 http_method='GET', name='getConferenceSessionsByType')
     def getConferenceSessionsByType(self, request):
         """Given a conference, return all sessions of a specified type"""
-        data = {field.name: getattr(request, field.name) for field in request.all_fields()}
+        data = {field.name: getattr(request, field.name) for field in
+                request.all_fields()}
         typeOfSession = data['typeOfSession']
 
         # Get conference by key
@@ -864,7 +871,8 @@ class ConferenceApi(remote.Service):
     def getSessionsBySpeaker(self, request):
         """Given a speaker, return all sessions given by this particular
         speaker, across all conferences"""
-        data = {field.name: getattr(request, field.name) for field in request.all_fields()}
+        data = {field.name: getattr(request, field.name) for field in
+                request.all_fields()}
         speaker = data['speaker']
 
         # Fetch all sessions by this speaker
