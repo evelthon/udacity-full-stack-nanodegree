@@ -23,7 +23,7 @@ DROP TABLE IF EXISTS players;
 --create the REFERENCE
 
 CREATE TABLE players (
-    id SERIAL UNIQUE PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     name TEXT
 );
 
