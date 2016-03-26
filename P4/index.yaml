@@ -107,3 +107,16 @@ indexes:
   properties:
   - name: date
   - name: startTime
+
+- kind: Session
+  properties:
+  - name: date
+    direction: desc
+  - name: startTime
+    direction: desc
+
+- kind: Session
+  ancestor: yes
+  properties:
+  - name: date
+  - name: startTime
