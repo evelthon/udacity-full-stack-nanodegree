@@ -145,6 +145,11 @@ class SessionForms(messages.Message):
     """SessionForms -- multiple Session outbound form message"""
     items = messages.MessageField(SessionForm, 1, repeated=True)
 
+class SpeakerForm(messages.Message):
+    """ SpeakerForm == Speaker outbound form message """
+    speaker     = messages.StringField(1)
+    sessionNames = messages.StringField(2, repeated=True)
+
 class Profile(ndb.Model):
     """Profile -- User profile object"""
     displayName = ndb.StringProperty()

@@ -38,6 +38,10 @@ A solution to this would be to use ndb/app engine to filter by one property,
 then filter that data by the second property natively in python.
 
 ## Task 4: Add a Task
+This task required the creation of a new endpoint method called
+`getFeaturedSpeaker`. This method would get the featured speaker if one exists
+from memcache. For this to happen, `_createSessionObject` was modified to save
+in memcache a speaker with many sessions.
 
 For this task the requirement was to create 2 additional queries. For this
 reason the following endpoint methods where created:

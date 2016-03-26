@@ -39,6 +39,7 @@ from models import SessionForm
 from models import SessionForms
 from models import SpeakerForm
 from models import SessionForms
+from models import SpeakerForm
 from models import Profile
 from models import ProfileMiniForm
 from models import ProfileForm
@@ -777,7 +778,19 @@ class ConferenceApi(remote.Service):
         # Save Session data
         Session(**data).put()
 
-        # Perhaps add here a memcache in future
+        """
+        Addition for Task 4
+        If speaker exists in other sessions as well, save in memcache
+        """
+        sessions = Session.query(Session.speaker == data['speaker'], ancestor=p_key)
+
+        if len(list(sessions)) > 1:
+            memcache_data = {}
+            memcache_data['speaker'] = data['speaker']
+            memcache_data['sessionNames'] = [session.name for session in sessions]
+
+            if not memcache.set(MEMCACHE_SPEAKER_KEY, memcache_data):
+                logging.error('Memcache set failed for featured speaker')
 
         return request
 
@@ -861,6 +874,33 @@ class ConferenceApi(remote.Service):
         return SessionForms(
             items=[self._copySessionToForm(session) for session in sessions])
 
+    @endpoints.method(message_types.VoidMessage, SpeakerForm,
+                      http_method='GET', name='getFeaturedSpeaker')
+    def getFeaturedSpeaker(self,request):
+        """ Returns a featured speaker and his/her sessions """
+        sessions = []
+        sessionNames = []
+        speaker = None
+
+        # look for data in memcache
+        memcache_data = memcache.get(MEMCACHE_SPEAKER_KEY)
+
+        if memcache_data:
+            speaker = memcache_data['speaker']
+            sessionNames = memcache_data['sessionNames']
+
+        else:
+            speaker = sessionNames = None
+
+        sf = SpeakerForm()
+        for field in sf.all_fields():
+            if field.name == 'speaker':
+                setattr(sf, field.name, speaker)
+            elif field.name == 'sessionNames':
+                setattr(sf, field.name, sessionNames)
+        sf.check_initialized()
+
+        return sf
 
 
     @endpoints.method(SessionForm, SessionForm,
