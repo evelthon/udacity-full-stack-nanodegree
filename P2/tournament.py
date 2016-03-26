@@ -69,6 +69,30 @@ def playerStandings():
         wins: the number of matches the player has won
         matches: the number of matches the player has played
     """
+    conn = connect()
+    c = conn.cursor()
+
+    # Use a left join to list players with 0 matches
+    c.execute("""SELECT p.id, p.name,
+        COUNT(m.winner) AS wins,
+        (
+        (
+        SELECT COUNT(m.winner)AS wins
+        FROM matches AS m, players AS p
+        WHERE m.winner = p.id
+        )+(
+        SELECT COUNT(m.loser)AS losses
+        FROM matches AS m, players AS p
+        WHERE m.winner = p.id
+        )
+        ) as SUms
+        FROM players AS p LEFT JOIN matches AS m
+        ON (m.winner = p.id OR m.loser = p.id)
+        GROUP BY p.id, p.name
+        ORDER BY wins""")
+    player_standings = list(c)
+    conn.close()
+    return player_standings
 
 
 def reportMatch(winner, loser):
