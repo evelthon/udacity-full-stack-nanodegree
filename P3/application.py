@@ -40,29 +40,23 @@ def index():
                            page=page)
 
 
-# Edit category
-# @app.route('/category/<int:category_id>/edit')
-# def edit_category(category_id):
-#     return 'This functions allows editing of category %s' % category_id
-
-
 # Show all items of a specific category
-@app.route('/category/<int:category_id>/')
+@app.route('/category/<int:category_id>/', methods=['GET'])
 def list_category_items(category_id):
     categories, items = all_query()
     page = {'h5_title': 'Category items'}
     try:
         items = db_session.query(Item).filter_by(category_id=category_id).all()
-    except:
-        print('Error in view_item')
+    except Exception as e:
+        flash(str(e), 'warning')
+        return redirect(url_for('index'))
     return render_template('index.html',
                            categories=categories,
                            items=items,
                            page=page)
 
 # Show contents of specific item
-
-
+@app.route('/item/<int:item_id>', methods=['GET'])
 
 # Show contents of specific item
 @app.route('/item/<int:item_id>')
@@ -79,8 +73,6 @@ def view_item(item_id):
 
 
 # Add an item
-
-
 @app.route('/item/add', methods=['GET', 'POST'])
 def add_item():
     if not authenticated():
@@ -96,11 +88,9 @@ def add_item():
             return redirect(url_for('index'))
         except Exception as e:
             db_session.rollback()
-            # print(e)
             categories = db_session.query(Category).all()
             return render_template('add_item.html',
                            categories=categories)
-
 
     else:
         categories = db_session.query(Category).all()
@@ -125,7 +115,7 @@ def edit_item(item_id):
     if not owner(item):
         return redirect(url_for('view_item', item_id=item.id))
 
-    # Proceed
+    # All OK, Proceed
     if request.method == 'POST':
         post_data = process_post(request.form)
         item.title = post_data.title
@@ -196,7 +186,7 @@ def delete_item(item_id):
 # ############################################
 
 # Login
-@app.route('/login')
+@app.route('/login', methods=['GET'])
 def login():
     return github.authorize()
 
@@ -246,7 +236,7 @@ def api_categories():
     return jsonify(categories=[c.serialize for c in categories])
 
 
-# Get specific category in JSON format
+# Get items of specific category in JSON format
 @app.route('/category/<int:category_id>/json', methods=['GET'])
 def api_category_items(category_id):
     items = db_session.query(Item).filter_by(category_id=category_id).order_by(Item.id.desc())
