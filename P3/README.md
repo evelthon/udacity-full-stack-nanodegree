@@ -5,6 +5,8 @@ a variety of categories.
 It implements oauth authentication through GitHub. Authenticated users have
 the ability to modify their own items.
 The interface is based on Zurb's foundation framework.
+
+Supports API endpoints for JSON and XML.
 ## Usage
 1. Fork the repository  so that you have your own version of the files
 2. Change directory to vagrant/catalog
