@@ -7,7 +7,7 @@ The required endpoints for sessions and speaker where created. Specifically:
 1. The speaker is a property of the Session class. It is a required string.
 Alternatively, the speaker could be linked to a user account for this to be
 more consistent.
-1. Sessions where designed as children of the conference. As such, the ancestor
+2. Sessions where designed as children of the conference. As such, the ancestor
 keyword was used to signify this.
 1. The speaker is a property of the Session class. It is a `required string`.
 Alternatively, the speaker could be linked to a user account for this to be
@@ -24,6 +24,14 @@ three endpoint methods created for this task, `addSessionToWishlist`,
 `getSessionsInWishlist`, `deleteSessionInWishlist`.
 
 ## Task 3: Work on indexes and queries
+For this task the requirement was to create 2 additional queries. For this
+reason the following endpoint methods where created:
+1. `getFutureSessions`: List all future sessions remaining since now.
+2. `getPreConferenceSessions`: List pre-conference sessions, that's sessions
+occuring before the main conference starts.
+
+Additionally we need to query for non-workshop sessions occuring before 19:00
+The problem here is that ndb queries can only have 1 inequality  filter.
 For this task the requirement was to create 2 additional queries. For this
 reason the following endpoint methods where created:
 1. `getFutureSessions`: List all future sessions remaining since now.

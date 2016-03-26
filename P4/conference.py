@@ -547,6 +547,48 @@ class ConferenceApi(remote.Service):
         return SessionForms(
             items=[self._copySessionToForm(session) for session in sessions])
 
+    @endpoints.method(SESSION_GET_REQUEST, SessionForms,
+                      http_method='GET', name='getFutureSessions')
+    def getFutureSessions(self,request):
+        """ Returns a list of sessions happening in the future """
+
+        # Get current conference
+        conf = ndb.Key(urlsafe=request.websafeConferenceKey).get()
+
+        # Make sure the conference exists
+        if not conf:
+            raise endpoints.NotFoundException(
+                'No conference found with key: %s'
+                % request.websafeConferenceKey)
+
+        sessions = Session.query(ancestor=ndb.Key(Conference, conf.key.id()))\
+            .filter(Session.date >= datetime.now())\
+            .order(Session.date, Session.startTime)
+
+        return SessionForms(
+            items=[self._copySessionToForm(session) for session in sessions])
+
+    @endpoints.method(SESSION_GET_REQUEST, SessionForms,
+                      http_method='GET', name='getPreConferenceSessions')
+    def getPreConferenceSessions(self,request):
+        """ Returns a list of sessions happening before the main conference """
+
+        # Get current conference
+        conf = ndb.Key(urlsafe=request.websafeConferenceKey).get()
+
+        # Make sure the conference exists
+        if not conf:
+            raise endpoints.NotFoundException(
+                'No conference found with key: %s'
+                % request.websafeConferenceKey)
+
+        sessions = Session.query(ancestor=ndb.Key(Conference, conf.key.id()))\
+            .filter(Session.date < conf.startDate)\
+            .order(Session.date, Session.startTime)
+
+        return SessionForms(
+            items=[self._copySessionToForm(session) for session in sessions])
+
 
     @endpoints.method(SPEAKER_GET_REQUEST, SessionForms,
             path='sessions/{speaker}',
