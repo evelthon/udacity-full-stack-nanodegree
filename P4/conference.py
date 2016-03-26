@@ -123,6 +123,11 @@ SESSION_POST_REQUEST = endpoints.ResourceContainer(
     websafeConferenceKey=messages.StringField(1, required=True)
 )
 
+SPEAKER_GET_REQUEST = endpoints.ResourceContainer(
+    message_types.VoidMessage,
+    speaker=messages.StringField(1, required=True)
+)
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
@@ -792,14 +797,21 @@ class ConferenceApi(remote.Service):
             items=[self._copySessionToForm(session) for session in sessions])
 
 
-
-
-
-    @endpoints.method(message_types.VoidMessage, SessionForms,
-            path='sessions',
+    @endpoints.method(SPEAKER_GET_REQUEST, SessionForms,
+            path='sessions/{speaker}',
             http_method='GET', name='getSessionsBySpeaker')
     def getSessionsBySpeaker(self, request):
-        """Given a speaker, return all sessions given by this particular speaker, across all conferences"""
+        """Given a speaker, return all sessions given by this particular
+        speaker, across all conferences"""
+        data = {field.name: getattr(request, field.name) for field in request.all_fields()}
+        speaker = data['speaker']
+
+        # Fetch all sessions by this speaker
+        sessions = Session.query(Session.speaker == speaker)
+
+        # Return SessionForm objects
+        return SessionForms(
+            items=[self._copySessionToForm(session) for session in sessions])
 
 
 
