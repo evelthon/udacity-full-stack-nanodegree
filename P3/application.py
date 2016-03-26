@@ -58,8 +58,9 @@ def list_category_items(category_id):
 def view_item(item_id):
     try:
         item = session.query(Item).filter_by(id=item_id).one()
-    except:
-        print('Error in view_item')
+    except Exception as e:
+        flash('Unable to retrieve item information.', 'warning')
+        return redirect(url_for('index'))
 
     return render_template('view_item.html',
                            item=item)
@@ -78,7 +79,7 @@ def add_item():
             return redirect(url_for('index'))
         except Exception as e:
             session.rollback()
-            print(e)
+            # print(e)
             categories = session.query(Category).all()
             return render_template('add_item.html',
                            categories=categories)
@@ -91,9 +92,32 @@ def add_item():
 
 
 # Edit contents of specific item
-@app.route('/item/<int:item_id>/edit')
+@app.route('/item/<int:item_id>/edit', methods=['GET', 'POST'])
 def edit_item(item_id):
-    return 'This will edit item %s ' % (item_id)
+    # item = session.query(Item).filter_by(id=item_id).one()
+    if request.method == 'POST':
+        post_data = process_post(request.form)
+        item.title = post_data.title
+        item.description = post_data.description
+        item.category_id = post_data.category_id
+        try:
+            session.commit()
+            flash('Item edited successfully.', 'success')
+            return redirect(url_for('list_category_items', category_id=item.category_id))
+        except Exception as e:
+            session.rollback()
+            flash('Unable to save data', 'alert')
+            return redirect(url_for('edit_item', item_id=item.id))
+    else:
+        try:
+            item = session.query(Item).filter_by(id=item_id).one()
+            categories = session.query(Category).all()
+        except Exception as e:
+            flash('Unable to retrieve item information.', 'warning')
+            return redirect(url_for('index'))
+
+        return render_template('edit_item.html', item=item, categories=categories,
+                           action=url_for('edit_item', item_id=item.id))
 
 
 # Delete specific item
