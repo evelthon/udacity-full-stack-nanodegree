@@ -35,7 +35,6 @@ def countPlayers():
     c = conn.cursor()
     c.execute("SELECT COUNT(*) FROM players")
     player_count = c.fetchone()[0]
-    # print (player_count[0])
     conn.close()
     return player_count
 
@@ -82,7 +81,6 @@ def playerStandings():
         GROUP BY p.id, p.name
         ORDER BY wins DESC""")
     player_standings = list(c)
-    # print(player_standings)
     conn.close()
     return player_standings
 
@@ -118,3 +116,21 @@ def swissPairings():
         id2: the second player's unique id
         name2: the second player's name
     """
+
+    player_pairs = []
+
+    conn = connect()
+    c = conn.cursor()
+    # Get pairs through the minimalistic beauty of stored procedure
+    c.execute("""SELECT * FROM pairings_view""")
+
+    data = list(c)
+    num_of_results = c.rowcount
+    conn.close()
+
+    for i in range(0, num_of_results, 2):
+        pair = (data[i][0], data[i][1], data[i+1][0], data[i+1][1])
+        player_pairs.append(pair)
+
+    return player_pairs
+
