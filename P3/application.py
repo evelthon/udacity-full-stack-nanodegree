@@ -111,11 +111,12 @@ def process_post(post):
     '''
     post = dict(post)
     print(post)
-    title = bleach.clean(post['title'])
-    description = bleach.clean(post['description'])
-    print(post['category'][0])
+    title = bleach.clean(post['title'][0])
+    description = bleach.clean(post['description'][0])
+    # print(post['category'][0])
     category_id = int(bleach.clean(post['category'][0]))
-
+    # print(post['title'])
+    # print(title)
     item = Item(title=title,
                 description=description,
                 category_id=category_id)
