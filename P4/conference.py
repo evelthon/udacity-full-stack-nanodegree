@@ -112,6 +112,17 @@ WISHLIST_POST_REQUEST = endpoints.ResourceContainer(
     websafeSessionKey=messages.StringField(1, required=True),
 )
 
+SESSION_GET_REQUEST = endpoints.ResourceContainer(
+    message_types.VoidMessage,
+    websafeConferenceKey=messages.StringField(1, required=True),
+    typeOfSession=messages.StringField(2)
+)
+
+SESSION_POST_REQUEST = endpoints.ResourceContainer(
+    SessionForm,
+    websafeConferenceKey=messages.StringField(1, required=True)
+)
+
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
@@ -673,6 +684,42 @@ class ConferenceApi(remote.Service):
         return self._copySessionToForm(session)
 
 # - - - Session objects - - - - - - - - - - - - - - - - - - -
+    def _createSessionObject(self, request):
+        user = endpoints.get_current_user()
+        if not user:
+            raise endpoints.UnauthorizedException('Authorization required')
+
+        # get Profile from datastore
+        user_id = getUserId(user)
+
+        # make sure a conference exists
+        conf = ndb.Key(urlsafe=request.websafeConferenceKey).get()
+        if not conf:
+            raise endpoints.NotFoundException('No conference found')
+
+        # Verify the user the the conference owner
+        if user_id != conf.organizerUserId:
+            raise endpoints.ForbiddenException('Only the conference owner can add sessions')
+
+        # Copy SessionForm message to dict
+        data = {field.name: getattr(request, field.name) for field in request.all_fields()}
+
+        # Generate session key using parent relationship
+        # ID based on Profile key get Conference key from ID
+        p_key = ndb.Key(Conference, conf.key.id())
+        c_id = Session.allocate_ids(size=1, parent=p_key)[0]
+        c_key = ndb.Key(Session, c_id, parent=p_key)
+        data['key'] = c_key
+        data['organizerUserId'] = request.organizerUserId = user_id
+        del data['websafeKey']
+        del data['websafeConferenceKey']
+        # Save Session data
+        Session(**data).put()
+
+        # Perhaps add here a memcache in future
+
+        return request
+
     @endpoints.method(CONF_GET_REQUEST, ConferenceForm,
                 path='conference/{websafeConferenceKey}/sessions',
                 http_method='GET', name='getConferenceSessions')
@@ -698,6 +745,7 @@ class ConferenceApi(remote.Service):
             http_method='POST', name='createSession')
     def createSession(self, request):
         """Open to the organizer of the conference"""
+        return self._createSessionObject(request)
 
 # - - - Profile objects - - - - - - - - - - - - - - - - - - -
 
