@@ -31,7 +31,14 @@ reason the following endpoint methods where created:
 occuring before the main conference starts.
 
 Additionally we need to query for non-workshop sessions occuring before 19:00
-The problem here is that ndb queries can only have 1 inequality  filter.
+The problem here is that ndb queries in app engine support multiple inequality
+filter as long as they are on the same property. This is not the case here.
+
+A solution to this would be to use ndb/app engine to filter by one property,
+then filter that data by the seconda property natively in python.
+
+## Task 4: Add a Task
+
 For this task the requirement was to create 2 additional queries. For this
 reason the following endpoint methods where created:
 1. `getFutureSessions`: List all future sessions remaining since now.
