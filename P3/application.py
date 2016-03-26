@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, render_template, request, session, redirect, url_for
+from flask import Flask, flash, render_template, request, session, redirect, url_for
 from database_setup import Base, Category, Item
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -8,6 +8,9 @@ import bleach
 
 app = Flask(__name__)
 #from app import views
+
+# Set session secret key
+app.secret_key = 'app_secret_key'
 
 
 engine = create_engine('postgresql+psycopg2://catalog:catalog@localhost/catalog')
@@ -71,6 +74,7 @@ def add_item():
 
         try:
             session.commit()
+            flash('Item added.', 'success')
             return redirect(url_for('index'))
         except Exception as e:
             session.rollback()
@@ -81,8 +85,6 @@ def add_item():
 
 
     else:
-        test=2
-
         categories = session.query(Category).all()
         return render_template('add_item.html',
                            categories=categories)
@@ -90,13 +92,37 @@ def add_item():
 
 # Edit contents of specific item
 @app.route('/item/<int:item_id>/edit')
-def edit_item(category_id,item_id):
-    return 'This will edit item %s in category %s' % (item_id, category_id)
+def edit_item(item_id):
+    return 'This will edit item %s ' % (item_id)
+
 
 # Delete specific item
-@app.route('/category/<int:category_id>/item/<int:item_id>/delete')
-def delete_item(category_id,item_id):
-    return 'This will delete item %s in category %s' % (item_id, category_id)
+@app.route('/item/<int:item_id>/delete', methods=['GET', 'POST'])
+def delete_item(item_id):
+
+    if request.method == 'POST':
+
+        item = session.query(Item).filter_by(id=item_id).one()
+        session.delete(item)
+
+        # print('Item category id')
+        # print(item.category.id)
+        try:
+            session.commit()
+            flash('Item deleted.', 'success')
+            return redirect(url_for('list_category_items', category_id=item.category_id))
+        except Exception as e:
+            flash('Unable to delete item', 'alert')
+        return redirect(url_for('delete_item', item_id=item.id))
+    else:
+        try:
+            item = session.query(Item).filter_by(id=item_id).one()
+        except Exception as e:
+            flash('Unable to retrieve item information', 'warning')
+            return redirect(url_for('view_item', item_id=item.id))
+
+        return render_template('delete_item.html', item=item)
+
 
 def process_post(post):
     '''
