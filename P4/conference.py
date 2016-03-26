@@ -720,6 +720,22 @@ class ConferenceApi(remote.Service):
 
         return request
 
+
+    def _copySessionToForm(self, session):
+        """Copy relevant fields from Session to SessionForm."""
+        sf = SessionForm()
+        for field in sf.all_fields():
+            if hasattr(session, field.name):
+                # convert Date, time to string;just copy others
+                if field.name in ['startTime', 'date']:
+                    setattr(sf, field.name, str(getattr(session, field.name)))
+                else:
+                    setattr(sf, field.name, getattr(session, field.name))
+            elif field.name == "websafeKey":
+                setattr(sf, field.name, session.key.urlsafe())
+        sf.check_initialized()
+        return sf
+
     @endpoints.method(CONF_GET_REQUEST, ConferenceForm,
                 path='conference/{websafeConferenceKey}/sessions',
                 http_method='GET', name='getConferenceSessions')
