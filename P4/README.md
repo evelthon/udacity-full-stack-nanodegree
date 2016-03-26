@@ -4,9 +4,10 @@ A cloud based project for conference organization
 
 ## Task 1: Add Sessions to a Conference
 The required endpoints for sessions and speaker where created. Specifically:
-1. The speaker is a property of the Session class. It is a required string.
+1. The speaker is a property of the Session class. It is a `required string`.
 Alternatively, the speaker could be linked to a user account for this to be
-more consistent.
+more consistent. Still, doing so would require the speaker to register as a
+user.
 2. Sessions where designed as children of the conference. As such, the ancestor
 keyword was used to signify this.
 1. The speaker is a property of the Session class. It is a `required string`.
@@ -30,10 +31,10 @@ reason the following endpoint methods where created:
 2. `getPreConferenceSessions`: List pre-conference sessions, that's sessions
 occuring before the main conference starts.
 
-Additionally we need to query for non-workshop sessions occuring before 19:00
-The problem here is that ndb queries in app engine support multiple inequality
-filter as long as they are on the same property. This is not the case here.
-
+Additionally we need to solve a query problem for non-workshop sessions
+occuring before 19:00. The problem here is that ndb queries in app engine
+support multiple inequality filter as long as they are on the same property.
+This is not the case here.
 A solution to this would be to use ndb/app engine to filter by one property,
 then filter that data by the second property natively in python.
 
