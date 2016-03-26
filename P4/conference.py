@@ -38,6 +38,7 @@ from models import Session
 from models import SessionForm
 from models import SessionForms
 from models import SpeakerForm
+from models import SessionForms
 from models import Profile
 from models import ProfileMiniForm
 from models import ProfileForm
@@ -115,17 +116,22 @@ WISHLIST_POST_REQUEST = endpoints.ResourceContainer(
 SESSION_GET_REQUEST = endpoints.ResourceContainer(
     message_types.VoidMessage,
     websafeConferenceKey=messages.StringField(1, required=True),
-    typeOfSession=messages.StringField(2)
+    typeOfSession=messages.StringField(2),
 )
 
 SESSION_POST_REQUEST = endpoints.ResourceContainer(
     SessionForm,
-    websafeConferenceKey=messages.StringField(1, required=True)
+    websafeConferenceKey=messages.StringField(1, required=True),
 )
 
 SPEAKER_GET_REQUEST = endpoints.ResourceContainer(
     message_types.VoidMessage,
-    speaker=messages.StringField(1, required=True)
+    speaker=messages.StringField(1, required=True),
+)
+
+WISHLIST_POST_REQUEST = endpoints.ResourceContainer(
+    message_types.VoidMessage,
+    websafeSessionKey=messages.StringField(1, required=True),
 )
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -821,6 +827,70 @@ class ConferenceApi(remote.Service):
     def createSession(self, request):
         """Open to the organizer of the conference"""
         return self._createSessionObject(request)
+
+
+    @endpoints.method(WISHLIST_POST_REQUEST, SessionForm,
+                      http_method='POST', name='addSessionToWishlist')
+    def addSessionToWishlist(self, request):
+        """ Adds the session to the user's list of sessions they are interested
+         in attending
+        """
+        # make sure user is authed
+        user = endpoints.get_current_user()
+        if not user:
+            raise endpoints.UnauthorizedException('Authorization required')
+
+        # Get the session we are referring to
+        session = ndb.Key(urlsafe=request.websafeSessionKey).get()
+
+        if not session:
+            raise endpoints.NotFoundException('No session found with key: %s'
+                                              % request.websafeSessionKey)
+
+        # Get user profile
+        prof = self._getProfileFromUser()
+
+        # Make sure session is not already added to wishlist
+        if session.key in prof.sessionWishlist:
+            raise endpoints.BadRequestException(
+                'The wishlist already has a session with key: %s' %
+                request.websafeSessionKey)
+
+        # All good so far. Append the new session key and save
+        prof.sessionWishlist.append(session.key)
+        prof.put()
+
+        return self._copySessionToForm(session)
+
+
+    @endpoints.method(message_types.VoidMessage, SessionForms,
+                      http_method='POST', name='getSessionsInWishlist')
+    def getSessionsInWishlist(self, request):
+        """ Query for all the sessions in a conference that the user is
+        interested in"""
+        # make sure user is authed
+        user = endpoints.get_current_user()
+        if not user:
+            raise endpoints.UnauthorizedException('Authorization required')
+
+        prof = self._getProfileFromUser()
+        wishlist_session_keys = prof.sessionWishlist
+        sessions = [wishlist_session_key.get() for wishlist_session_key in
+                    wishlist_session_keys]
+
+        return SessionForms(items=[self._copySessionToForm(session) for
+                                   session in sessions])
+
+        # Get user profile
+        prof = self._getProfileFromUser()
+
+
+    @endpoints.method(WISHLIST_POST_REQUEST, SessionForm,
+                      http_method='POST', name='deleteSessionInWishlist')
+    def deleteSessionInWishlist(self, request):
+        """ Removes the session from the user's list of sessions they are
+        interested in attending
+        """
 
 # - - - Profile objects - - - - - - - - - - - - - - - - - - -
 

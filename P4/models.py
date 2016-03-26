@@ -145,6 +145,26 @@ class SessionForms(messages.Message):
     """SessionForms -- multiple Session outbound form message"""
     items = messages.MessageField(SessionForm, 1, repeated=True)
 
+class Profile(ndb.Model):
+    """Profile -- User profile object"""
+    displayName = ndb.StringProperty()
+    mainEmail = ndb.StringProperty()
+    teeShirtSize = ndb.StringProperty(default='NOT_SPECIFIED')
+    conferenceKeysToAttend = ndb.StringProperty(repeated=True)
+    sessionWishlist = ndb.KeyProperty(Session, repeated=True)
+
+class ProfileMiniForm(messages.Message):
+    """ProfileMiniForm -- update Profile form message"""
+    displayName = messages.StringField(1)
+    teeShirtSize = messages.EnumField('TeeShirtSize', 2)
+
+class ProfileForm(messages.Message):
+    """ProfileForm -- Profile outbound form message"""
+    displayName = messages.StringField(1)
+    mainEmail = messages.StringField(2)
+    teeShirtSize = messages.EnumField('TeeShirtSize', 3)
+    conferenceKeysToAttend = messages.StringField(4, repeated=True)
+
 class ConferenceForms(messages.Message):
     """ConferenceForms -- multiple Conference outbound form message"""
     items = messages.MessageField(ConferenceForm, 1, repeated=True)
