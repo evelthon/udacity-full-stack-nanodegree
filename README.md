@@ -7,5 +7,5 @@ This repository contains project assignments for Udacity's [Full Stack Web Devel
 - **P1** - Movie Trailer Website
 - **p2** - Tournament Results
 - **P3** - Item Catalog
-- **44** - Conference Organization App (Google App Engine)
+- **P4** - Conference Organization App (Google App Engine)
 - **P5** - Linux-based Server Configuration (AWS)
