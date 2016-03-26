@@ -1,17 +1,12 @@
-import os
-import sys
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
-from sqlalchemy import create_engine
-# Configuration
 
 
 Base = declarative_base()
 
-# Create tables
 
-
+# Class representing table usr
 class User(Base):
     __tablename__='usr'
     id = Column(Integer, primary_key=True)
@@ -20,9 +15,8 @@ class User(Base):
     def __init__(self, access_token):
         self.access_token = access_token
 
+
 # Class representing table category
-
-
 class Category(Base):
     __tablename__='category'
     id = Column(Integer, primary_key=True)
@@ -40,9 +34,8 @@ class Category(Base):
             'name': self.name
         }
 
+
 # Class representing table item
-
-
 class Item(Base):
     __tablename__='item'
     id = Column(Integer, primary_key=True)
