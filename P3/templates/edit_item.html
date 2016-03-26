@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block main %}
+            {% if session.usr_id  and can_edit(item) %}
+       <h5>Editing {{item.title}}</h5>
+      <div class="large-12 medium-12 columns">
+
+<form action="{{action}}" method="post">
+
+          <div class="row">
+            <div class="large-12 columns">
+              <label>Title</label>
+              <input type="text" name="title" placeholder="Enter item title..." value="{{item.title}}" />
+            </div>
+          </div>
+        <div class="row">
+            <div class="large-12 columns">
+              <label>Description</label>
+              <input type="text" name="description" placeholder="Enter item description..." value="{{item.description}}"/>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="large-12 columns">
+              <label>Category</label>
+              <select name="category">
+                    {% for category in categories %}
+                  {% if category.id==item.category_id %}
+                  <option value="{{category.id}}" selected>{{category.name}}</option>
+                   {% else %}
+                  <option value="{{category.id}}">{{category.name}}</option>
+                  {% endif %}
+            {% endfor %}
+              </select>
+            </div>
+          </div>
+          <!--<div class="row">-->
+
+
+    <button class="small button" name="Send" type="submit">Save</button>
+    <button class="small button [success secondary alert]" name="reset" type="reset">Cancel</button>
+
+        </form>
+      </div>
+
+
+            {% endif %}
+ {% if not can_edit(item) %}
+<h5>You are not allowed to edit this item.</h5>
+ {% endif %}
+
+
+
+{% endblock %}
