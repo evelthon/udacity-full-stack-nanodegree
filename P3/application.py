@@ -12,8 +12,8 @@ import bleach
 from xml.etree.ElementTree  import Element, SubElement, Comment, tostring
 
 app = Flask(__name__)
-app.config['GITHUB_CLIENT_ID'] = '506e2fc17c83f1054317'
-app.config['GITHUB_CLIENT_SECRET'] = 'd00c874aff85087d5528cedb6b2ca86736eb67dd'
+app.config['GITHUB_CLIENT_ID'] = 'XX'
+app.config['GITHUB_CLIENT_SECRET'] = 'YY'
 github = GitHub(app)
 
 
@@ -124,7 +124,8 @@ def edit_item(item_id):
         try:
             db_session.commit()
             flash('Item edited successfully.', 'success')
-            return redirect(url_for('list_category_items', category_id=item.category_id))
+            return redirect(url_for('list_category_items',
+                                    category_id=item.category_id))
         except Exception as e:
             db_session.rollback()
             flash('Unable to save data', 'alert')
@@ -137,9 +138,10 @@ def edit_item(item_id):
             flash('Unable to retrieve item information.', 'warning')
             return redirect(url_for('index'))
 
-        return render_template('edit_item.html', item=item, categories=categories,
-                           action=url_for('edit_item', item_id=item.id),
-                           can_edit=owner)
+        return render_template('edit_item.html', item=item,
+                               categories=categories,
+                               action=url_for('edit_item', item_id=item.id),
+                                can_edit=owner)
 
 
 # Delete specific item
@@ -167,7 +169,8 @@ def delete_item(item_id):
         try:
             db_session.commit()
             flash('Item deleted.', 'success')
-            return redirect(url_for('list_category_items', category_id=item.category_id))
+            return redirect(url_for('list_category_items',
+                                    category_id=item.category_id))
         except Exception as e:
             flash('Unable to delete item', 'alert')
         return redirect(url_for('delete_item', item_id=item.id))
