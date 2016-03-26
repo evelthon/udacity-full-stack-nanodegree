@@ -35,7 +35,7 @@ The problem here is that ndb queries in app engine support multiple inequality
 filter as long as they are on the same property. This is not the case here.
 
 A solution to this would be to use ndb/app engine to filter by one property,
-then filter that data by the seconda property natively in python.
+then filter that data by the second property natively in python.
 
 ## Task 4: Add a Task
 
