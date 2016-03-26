@@ -116,6 +116,7 @@ class ProfileForm(messages.Message):
 
 class Session(ndb.Model):
     """ Session -- Session object """
+    # Do we need memcache?
     name = ndb.StringProperty(required=True)
     highlights = ndb.StringProperty()
     speaker = ndb.StringProperty(required=True)
@@ -123,6 +124,22 @@ class Session(ndb.Model):
     typeOfSession = ndb.StringProperty(required=True)
     date = ndb.DateProperty()
     startTime = ndb.TimeProperty()  # in 24-hr notation
+
+
+class SessionForm(messages.Message):
+    """SessionForm -- Session outbound form message"""
+    name            = messages.StringField(1)
+    highlights      = messages.StringField(2)
+    speaker         = messages.StringField(3)
+    duration        = messages.IntegerField(4) # units = minutes
+    typeOfSession   = messages.StringField(5)
+    date            = messages.DateField(6)
+    startTime       = messages.TimeField(7) # 24hr notation
+    websafeKey      = messages.StringField(8)
+
+class SessionForms(messages.Message):
+    """SessionForms -- multiple Session outbound form message"""
+    items = messages.MessageField(SessionForm, 1, repeated=True)
 
 class ConferenceForms(messages.Message):
     """ConferenceForms -- multiple Conference outbound form message"""
