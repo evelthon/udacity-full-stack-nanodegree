@@ -264,6 +264,29 @@ def api_categories_xml():
     return Response(tostring(root), mimetype='application/xml')
 
 
+# Get items of specific category in XML format
+@app.route('/category/<int:category_id>/xml', methods=['GET'])
+def api_category_items_xml(category_id):
+    items = db_session.query(Item).filter_by(category_id=category_id).order_by(Item.id.desc())
+    # categories = db_session.query(Category).all()
+
+    root = Element('items')
+
+    comment = Comment('List of items')
+    root.append(comment)
+
+    for item in items:
+        item_root = SubElement(root, 'category')
+        item_id = SubElement(item_root, 'id')
+        item_id.text = str(item.id)
+        item_title = SubElement(item_root, 'title')
+        item_title.text = item.title
+        item_description = SubElement(item_root, 'title')
+        item_description.text = item.description
+
+    return Response(tostring(root), mimetype='application/xml')
+
+
 # ################################
 # Helper functions
 # ################################
@@ -326,8 +349,7 @@ def process_post(post):
 
 
 def populate_database():
-    # Alter json file to add a root user with ID=1 and reference that user in
-    # default items
+
     """
     Add some initial data in an empty database from a json file
     """
@@ -351,7 +373,8 @@ def populate_database():
 
         item_date = data['item']
         for i in item_date:
-            item = Item(title=i['title'], description=i['description'], category_id=i['category_id'])
+            item = Item(title=i['title'], description=i['description'],
+                        category_id=i['category_id'])
             db_session.add(item)
 
         try:
