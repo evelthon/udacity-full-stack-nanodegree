@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, redirect, url_for
 from database_setup import Base, Category, Item
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import json
-
+import bleach
 
 app = Flask(__name__)
 #from app import views
@@ -66,12 +66,25 @@ def view_item(item_id):
 @app.route('/item/add', methods=['GET', 'POST'])
 def add_item():
     if request.method == 'POST':
-        test=1
+        item = process_post(request.form)
+        session.add(item)
+
+        try:
+            session.commit()
+            return redirect(url_for('index'))
+        except Exception as e:
+            session.rollback()
+            print(e)
+            categories = session.query(Category).all()
+            return render_template('add_item.html',
+                           categories=categories)
+
+
     else:
         test=2
 
-    categories = session.query(Category).all()
-    return render_template('add_item.html',
+        categories = session.query(Category).all()
+        return render_template('add_item.html',
                            categories=categories)
 
 
@@ -85,7 +98,29 @@ def edit_item(category_id,item_id):
 def delete_item(category_id,item_id):
     return 'This will delete item %s in category %s' % (item_id, category_id)
 
+def process_post(post):
+    '''
 
+    Args:
+        post: the request.form posted data
+
+    Returns:
+        an object of class Item
+
+
+    '''
+    post = dict(post)
+    print(post)
+    title = bleach.clean(post['title'])
+    description = bleach.clean(post['description'])
+    print(post['category'][0])
+    category_id = int(bleach.clean(post['category'][0]))
+
+    item = Item(title=title,
+                description=description,
+                category_id=category_id)
+
+    return item
 
 def populate_database():
     '''
@@ -106,7 +141,7 @@ def populate_database():
 
         item_date = data['item']
         for i in item_date:
-            item = Item(id=i['id'], title=i['title'], description=i['description'], category_id=i['category_id'])
+            item = Item(title=i['title'], description=i['description'], category_id=i['category_id'])
             session.add(item)
 
         try:
