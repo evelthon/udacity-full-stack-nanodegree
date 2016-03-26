@@ -85,9 +85,6 @@ def testReportMatches():
     reportMatch(id3, id4)
     standings = playerStandings()
     for (i, n, w, m) in standings:
-        # print("-------")
-        # print(i, n, w, m)
-        # print("-------")
         if m != 1:
             raise ValueError("Each player should have one match recorded.")
         if i in (id1, id3) and w != 1:
@@ -154,5 +151,5 @@ if __name__ == '__main__':
     testCount()
     testStandingsBeforeMatches()
     testReportMatches()
-    # testPairings()
+    testPairings()
     print "Success!  All tests pass!"
