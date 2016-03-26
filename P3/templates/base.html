@@ -1,0 +1,89 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Catalog app</title>
+    <link rel="stylesheet" href="/static/css/foundation.css" />
+    <link rel="stylesheet" href="/static/css/app.css" />
+
+      <style>
+.alert-box {
+  background: #f7f7f7;
+  color: #333;
+  border: none;
+  border-left: 6px solid #008CBA;
+  box-shadow: 0 5px 8px -6px rgba(0, 0, 0, 0.2); }
+  .alert-box.success {
+    background: #f7f7f7;
+    color: #333; }
+  .alert-box.alert {
+    background: #f7f7f7;
+    color: #333; }
+  .alert-box.warning {
+    background: #f7f7f7;
+    color: #333; }
+  .alert-box.info {
+    background: #f7f7f7;
+    color: #333; }
+  .alert-box.small {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    font-size: 0.75rem; }
+    .alert-box.small .close {
+      font-size: 1.5rem; }
+  .alert-box.large {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    font-size: 2rem; }
+    .alert-box.large .close {
+      font-size: 3rem; }
+  .alert-box .close {
+    font-size: 2rem;
+    line-height: 1.25rem; }
+
+
+</style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="top-bar-left">
+        <ul class="menu">
+          <li class="menu-text"><a href="/">Catalog app</a> </li>
+        </ul>
+      </div>
+      <div class="top-bar-right">
+        <ul class="menu">
+          <li>
+            {% if session.usr_id  %}
+              <a href="{{url_for('logout')}}" class="small button">Logout</a></li>
+            {% else %}
+              <a href="{{url_for('login')}}" class="small button">Login</a></li>
+            {% endif %}
+          </ul>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Display flashed messages -->
+      {% with msgs = get_flashed_messages(with_categories=true) %}
+        {% if msgs %}
+          {% for category, msg in msgs %}
+                <div class="{{category}} callout" data-closable>
+              <p>{{ msg }}</p>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      {% block main %} {% endblock %}
+
+    </div>
+
+    <script src="/static/js/vendor/jquery.min.js"></script>
+    <script src="/static/js/vendor/what-input.min.js"></script>
+    <script src="/static/js/foundation.min.js"></script>
+    <script src="/static/js/app.js"></script>
+  </body>
+</html>
