@@ -20,5 +20,6 @@ and edit *app.config['GITHUB_CLIENT_ID']* and
 some default items are added to the database.
 
 ## Note
-The default items added on first run are not editable cause of the items
-ownership restrictions. In an ideal scenario, they would be editable by a root/admin user.
+The default items added on first run are not editable cause of the item
+ownership restrictions. In an ideal scenario, they would be editable by a
+root/admin user.
