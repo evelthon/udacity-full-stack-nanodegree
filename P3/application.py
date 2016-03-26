@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, flash, render_template, request, session, redirect, url_for
+from flask import Flask, flash, render_template, request, session, redirect, \
+                    url_for, jsonify, Response
 from database_setup import Base, Category, Item
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import json
 import bleach
+
+from xml.etree.ElementTree  import Element, SubElement, Comment, tostring
 
 app = Flask(__name__)
 #from app import views
@@ -148,6 +151,47 @@ def delete_item(item_id):
         return render_template('delete_item.html', item=item)
 
 
+### ##############################
+### API functions
+### ##############################
+@app.route('/category/all/json', methods=['GET'])
+def api_categories():
+    categories = session.query(Category).all()
+    return jsonify(categories=[c.serialize for c in categories])
+
+@app.route('/category/<int:category_id>/json', methods=['GET'])
+def api_category_items(category_id):
+    items = session.query(Item).filter_by(category_id=category_id).order_by(Item.id.desc())
+    return jsonify(items=[i.serialize for i in items])
+
+
+@app.route('/category/all/xml', methods=['GET'])
+def api_categories_xml():
+
+    categories = session.query(Category).all()
+
+    root = Element('categories')
+
+    comment = Comment('List of categories')
+    root.append(comment)
+
+    for category in categories:
+        cat_root = SubElement(root, 'category')
+        category_id = SubElement(cat_root, 'id')
+        category_id.text = str(category.id)
+        category_name = SubElement(cat_root, 'name')
+        category_name.text = category.name
+
+    return Response(tostring(root), mimetype='application/xml')
+
+
+### ##############################
+### Auth functions
+### ##############################
+
+### ##############################
+### Helper functions
+### ##############################
 def process_post(post):
     '''
 
