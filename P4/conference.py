@@ -695,17 +695,25 @@ class ConferenceApi(remote.Service):
         # make sure a conference exists
         conf = ndb.Key(urlsafe=request.websafeConferenceKey).get()
         if not conf:
-            raise endpoints.NotFoundException('No conference found')
+            raise endpoints.NotFoundException(
+                'No conference found with key: %s' %
+                request.websafeConferenceKey)
 
         # Verify the user the the conference owner
         if user_id != conf.organizerUserId:
-            raise endpoints.ForbiddenException('Only the conference owner can add sessions')
+            raise endpoints.ForbiddenException(
+                'Only the conference owner can add sessions')
 
         # Copy SessionForm message to dict
         data = {field.name: getattr(request, field.name) for field in request.all_fields()}
 
+        if data['date']:
+            data['date'] = datetime.strptime(data['date'][:10], "%Y-%m-%d").date()
+
+        if data['startTime']:
+            data['startTime'] = datetime.strptime(data['startTime'][:5], "%H:%M").time()
+
         # Generate session key using parent relationship
-        # ID based on Profile key get Conference key from ID
         p_key = ndb.Key(Conference, conf.key.id())
         c_id = Session.allocate_ids(size=1, parent=p_key)[0]
         c_key = ndb.Key(Session, c_id, parent=p_key)
