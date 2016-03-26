@@ -113,6 +113,17 @@ class ProfileForm(messages.Message):
     teeShirtSize = messages.EnumField('TeeShirtSize', 3)
     conferenceKeysToAttend = messages.StringField(4, repeated=True)
 
+
+class Session(ndb.Model):
+    """ Session -- Session object """
+    name = ndb.StringProperty(required=True)
+    highlights = ndb.StringProperty()
+    speaker = ndb.StringProperty(required=True)
+    duration = ndb.IntegerProperty()  # duration in minutes
+    typeOfSession = ndb.StringProperty(required=True)
+    date = ndb.DateProperty()
+    startTime = ndb.TimeProperty()  # in 24-hr notation
+
 class ConferenceForms(messages.Message):
     """ConferenceForms -- multiple Conference outbound form message"""
     items = messages.MessageField(ConferenceForm, 1, repeated=True)
