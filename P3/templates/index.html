@@ -1,45 +1,35 @@
 {% extends "base.html" %}
 
 {% block main %}
+    <div class="large-8 medium-8 columns">
+    <link href="http://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css" rel="stylesheet">
+        <div class="row">
+            <div class="small-6 small-centered columns"></div>
+        </div>
 
-      <div class="large-8 medium-8 columns">
+        <h5>{{page.h5_title}}</h5>
+            {% if session.usr_id  %}
+                <ul class="menu">
+                    <li><a href="{{url_for('add_item')}}" class="small button">Add item</a></li>
+                </ul>
+            {% endif %}
 
-  <link href="http://cdnjs.cloudflare.com/ajax/libs/foundicons/3.0.0/foundation-icons.css" rel="stylesheet">
-
-<div class="row">
-  <div class="small-6 small-centered columns">
-
-
-
-  </div>
-</div>
-
-         <h5>{{page.h5_title}}</h5>
-           {% if session.usr_id  %}
-          <ul class="menu">
-<li><a href="{{url_for('add_item')}}" class="small button">Add item</a></li>
-</ul>
-  {% endif %}
-
-                <ul>
-        {% for item in items %}
+        <ul>
+            {% for item in items %}
                 <li><a href="/item/{{item.id}}">{{item.title}}</a></li>
-        {% endfor %}
+            {% endfor %}
+        </ul>
 
-</ul>
+    </div>
 
-
-      </div>
-
-      <div class="large-4 medium-4 columns">
+    <div class="large-4 medium-4 columns">
         <h5>Categories</h5>
         <ul>
             {% for category in categories %}
-<li><a href="/category/{{category.id}}">{{category.name}}</a></li>
+                <li><a href="/category/{{category.id}}">{{category.name}}</a></li>
             {% endfor %}
-</ul>
-
-      </div>
+        </ul>
+    </div>
 
 
 {% endblock %}

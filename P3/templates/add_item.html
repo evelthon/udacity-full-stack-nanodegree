@@ -1,40 +1,32 @@
 {% extends "base.html" %}
 
 {% block main %}
-
-      <div class="large-12 medium-12 columns">
-
-<form action="/item/add" method="post">
-
-          <div class="row">
-            <div class="large-12 columns">
-              <label>Title</label>
-              <input type="text" name="title" placeholder="Enter item title..." />
+    <div class="large-12 medium-12 columns">
+        <form action="/item/add" method="post">
+            <div class="row">
+                <div class="large-12 columns">
+                    <label>Title</label>
+                    <input type="text" name="title" placeholder="Enter item title..." />
+                </div>
             </div>
-          </div>
-        <div class="row">
-            <div class="large-12 columns">
-              <label>Description</label>
-              <input type="text" name="description" placeholder="Enter item description..." />
+            <div class="row">
+                <div class="large-12 columns">
+                    <label>Description</label>
+                    <input type="text" name="description" placeholder="Enter item description..." />
+                </div>
             </div>
-          </div>
-
-          <div class="row">
-            <div class="large-12 columns">
-              <label>Category</label>
-              <select name="category">
-                    {% for category in categories %}
-<option value="{{category.id}}">{{category.name}}</option>
-            {% endfor %}
-              </select>
+            <div class="row">
+                <div class="large-12 columns">
+                    <label>Category</label>
+                    <select name="category">
+                        {% for category in categories %}
+                            <option value="{{category.id}}">{{category.name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
-          </div>
-          <!--<div class="row">-->
-
-
-    <button class="small button" name="Send" type="submit">Add item</button>
-    <button class="small button [success secondary alert]" name="reset" type="reset">Clear</button>
-
+            <button class="small button" name="Send" type="submit">Add item</button>
+            <button class="small button [success secondary alert]" name="reset" type="reset">Clear</button>
         </form>
       </div>
 
