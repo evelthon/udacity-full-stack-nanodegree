@@ -30,7 +30,7 @@ os.system('sudo -u postgres -H -- psql  -U postgres -d catalog -c "'
           'description TEXT, '
           'category_id INTEGER REFERENCES category(id) );"')
 
-# Set the owner of the above two tables to user 'category'
+# Set the owner of the above two tables to user 'catalog'
 os.system('sudo -u postgres -H -- psql  -U postgres -d catalog -c '
           '"ALTER TABLE category OWNER TO catalog;"')
 os.system('sudo -u postgres -H -- psql  -U postgres -d catalog -c '
